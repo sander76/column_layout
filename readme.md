@@ -5,6 +5,7 @@ Uses the 12 column bootstrap layout to create responsive columns.
 ## Syntax
 ```
 %1 **column1** %5 **column2** %6 **column3 (optional)**
+```
 
 Restrictions:
 

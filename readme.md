@@ -1,6 +1,7 @@
 # MkDocs Three column layout
 
 Uses the 12 column bootstrap layout to create responsive columns.
+You can create a 2 or 3 column layout.
 
 ## Syntax
 ```

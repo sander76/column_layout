@@ -12,3 +12,16 @@ Restrictions:
 
 - Each column can have a width between 1 and 9
 - Total column width should add up to 12
+
+## Installation:
+
+```
+python setup.py install
+```
+
+In your ```mkdocs.yml``` file:
+
+```markdown
+markdown_extensions:
+  - three_columns
+```

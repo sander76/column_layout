@@ -7,45 +7,49 @@ def makeExtension(*args, **kwargs):
     return ThreeColumnExtension(*args, **kwargs)
 
 
-THREECOL = r'(\%\d)([^\%]+)(\%\d)([^\%^\n]+)(\%*\d*)([^\n]*)'
+THREECOL = r'(\%\d\d{0,1}\s[^\%]+)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)'
 
 
 class ThreeColumnPattern(Pattern):
     def handleMatch(self, m):
-        _col_width1 = m.group(2)
-        _col_nr = m.group(3)
-        _col_width2 = m.group(4)
-        _text = m.group(5)
-        _col_width3 = m.group(6)
-        _image = m.group(7)
+        #line = m.string
+        #self._set_columns(line)
 
         # row column
         el1 = etree.Element("div")
         el1.set('class', 'instruction bg-info row')
 
-        # first column
-
-        col1 = etree.SubElement(el1, "div")
-        col1.set('class', self._get_col_width(_col_width1) + ' col1')
-        col1.text = _col_nr.strip()
-
-        col2 = etree.SubElement(el1, "div")
-        col2.set('class', self._get_col_width(_col_width2) + ' col2')
-        col2.text = _text.strip()
-
-        if _image == '':
-            pass
-        else:
-            col3 = etree.SubElement(el1, "div")
-            col3.set('class', self._get_col_width(_col_width3) + ' col3')
-            col3.text = _image
+        groupnr=1
+        match = self._get_group(m,groupnr)
+        while match:
+            print()
+            groupnr+=1
+            match = self._get_group(m,groupnr)
+        for idx,match in m.group:
+        # create the columns.
+        #for idx, col in enumerate(self.cols):
+            width, content = self._parse_column(col)
+            _col = etree.SubElement(el1, "div")
+            _col.set('class','col-md-{} col{}'.format(width,idx))
+            _col.text = content
 
         return el1
 
-    def _get_col_width(self, width):
-        _width = width[-1]
-        _col_width = "col-md-" + _width
-        return _col_width
+    def _get_group(self,m,groupnr):
+        match = m.group(groupnr)
+        return match
+
+    def _set_columns(self, line):
+        self.cols = line.split('%')[1:]
+
+    def _parse_column(self, column):
+        width, content = column.split(maxsplit=1)
+        return width, content.strip()
+
+        # def _get_col_width(self, width):
+        #     _width = width[-1]
+        #     _col_width = "col-md-" + _width
+        #     return _col_width
 
 
 class ThreeColumnExtension(Extension):

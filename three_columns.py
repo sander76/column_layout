@@ -8,7 +8,8 @@ def makeExtension(*args, **kwargs):
 
 
 #THREECOL = r'(\%\d\d{0,1}\s[^\%]+)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)'
-THREECOL = r'\%\d\d{0,1}\s.*?\n'
+#THREECOL = r'\%\d\d{0,1}\s.*?\n'
+THREECOL = r'\%\d{1,2}\s.*?\n'
 ALLCOLS = re.compile(r'\%(\d{1,2})\s(.+?)(?=\s\%\d|\Z)')
 #ALLCOLS = re.compile(r"\%{1}(\d{1,2})")
 

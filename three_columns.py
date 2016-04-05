@@ -1,3 +1,5 @@
+import re
+
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
 from markdown.util import etree
@@ -7,45 +9,53 @@ def makeExtension(*args, **kwargs):
     return ThreeColumnExtension(*args, **kwargs)
 
 
-THREECOL = r'(\%\d)([^\%]+)(\%\d)([^\%^\n]+)(\%*\d*)([^\n]*)'
+# THREECOL = r'(\%\d\d{0,1}\s[^\%]+)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)(\%\d\d{0,1}\s[^\%]+|.*)'
+# THREECOL = r'\%\d\d{0,1}\s.*?\n'
+THREECOL = r'(\%\d{1,2}\s[^\n]*)'
+ALLCOLS = re.compile(r'\%(\d{1,2})\s(.+?)(?=\s\%\d|\Z)')
 
+
+# ALLCOLS = re.compile(r"\%{1}(\d{1,2})")
 
 class ThreeColumnPattern(Pattern):
     def handleMatch(self, m):
-        _col_width1 = m.group(2)
-        _col_nr = m.group(3)
-        _col_width2 = m.group(4)
-        _text = m.group(5)
-        _col_width3 = m.group(6)
-        _image = m.group(7)
+        line = m.group(2)
+        self._set_columns(line)
 
         # row column
         el1 = etree.Element("div")
         el1.set('class', 'instruction bg-info row')
 
-        # first column
-
-        col1 = etree.SubElement(el1, "div")
-        col1.set('class', self._get_col_width(_col_width1) + ' col1')
-        col1.text = _col_nr.strip()
-
-        col2 = etree.SubElement(el1, "div")
-        col2.set('class', self._get_col_width(_col_width2) + ' col2')
-        col2.text = _text.strip()
-
-        if _image == '':
-            pass
-        else:
-            col3 = etree.SubElement(el1, "div")
-            col3.set('class', self._get_col_width(_col_width3) + ' col3')
-            col3.text = _image
+        # create the columns.
+        for idx, column in enumerate(self.cols):
+            width, content = column
+            _col = etree.SubElement(el1, "div")
+            _col.set('class', 'col-sm-{} col{}'.format(width, idx))
+            _col.text = content
 
         return el1
 
-    def _get_col_width(self, width):
-        _width = width[-1]
-        _col_width = "col-md-" + _width
-        return _col_width
+    # def _get_group(self,m,groupnr):
+    #     try:
+    #         match = m.group(groupnr+2)  # first group match is group +2
+    #         return match
+    #     except IndexError:
+    #         message = "error parsing: {}".format(m.string)
+    #         raise IndexError(message)
+
+    def _set_columns(self, line):
+        _cols = re.findall(ALLCOLS, line)
+        # _cols=re.split(ALLCOLS,line)
+        self.cols = _cols
+
+    def _parse_column(self, column):
+        width, content = column.split(maxsplit=1)
+        return width[1:], content.strip()
+
+        # def _get_col_width(self, width):
+        #     _width = width[-1]
+        #     _col_width = "col-md-" + _width
+        #     return _col_width
 
 
 class ThreeColumnExtension(Extension):

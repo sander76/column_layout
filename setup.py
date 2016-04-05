@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
         name='column_layout',
-        version='1.0',
+        version='2.1',
         packages=[''],
         url='',
         license='MIT',
